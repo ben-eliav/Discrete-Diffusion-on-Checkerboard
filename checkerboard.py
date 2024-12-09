@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import argparse
 import torch
 
 def inf_train_gen(n_grid_points: int = 128, batch_size: int = 200, device: str = "cpu", num_squares=4, seed: int = 0):
@@ -67,14 +69,26 @@ def create_checkerboard(*args, **kwargs):
         return methods[np.random.randint(0, len(methods))](*args, **kwargs)
         
 
-def display_checkerboards(n_grid_points: int = 256, batch_size: int = 200, device: str = "cpu", num_squares=8, seed=89):
-    fig, axs = plt.subplots(1, 4, figsize=(20, 5))
+def display_checkerboards(n_grid_points: int = 256, batch_size: int = 200, device: str = "cpu", num_squares=8, seed=89, save=False):
+    _, axs = plt.subplots(1, 4, figsize=(20, 5))
     for i in range(4):
         axs[i].imshow(create_checkerboard(n_grid_points, batch_size, device, num_squares, seed, method=i), cmap="gray")
         axs[i].axis("off")
     plt.tight_layout()
+    if save:
+        if not os.path.exists("outputs"):
+            os.makedirs("outputs")
+        plt.savefig("outputs/checkerboards.png")
     plt.show()
         
 
 if __name__ == "__main__":
-    display_checkerboards()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n_grid_points", type=int, default=256)
+    parser.add_argument("--batch_size", type=int, default=200)
+    parser.add_argument("--device", type=str, default="cpu")
+    parser.add_argument("--num_squares", type=int, default=8)
+    parser.add_argument("--seed", type=int, default=89)
+    parser.add_argument("--save", action="store_true")
+    args = parser.parse_args()
+    display_checkerboards(**vars(args))
