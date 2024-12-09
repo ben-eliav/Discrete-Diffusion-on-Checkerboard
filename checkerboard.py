@@ -75,3 +75,6 @@ def display_checkerboards(n_grid_points: int = 256, batch_size: int = 200, devic
     plt.tight_layout()
     plt.show()
         
+
+if __name__ == "__main__":
+    display_checkerboards()
