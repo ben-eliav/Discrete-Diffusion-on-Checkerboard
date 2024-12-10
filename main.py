@@ -69,6 +69,7 @@ def main():
     parser.add_argument("--nrow", type=int, default=8)
     parser.add_argument("--num_classes", type=int, default=2)
     parser.add_argument("--checkerboard_method", type=int, default=4)
+    parser.add_argument("--noisy_points", type=float, default=0.1)
     parser.add_argument("--dataset", type=str, default="checkerboard")
     parser.add_argument("--train_size", type=int, default=1000)
     parser.add_argument("--checkerboard_noise", type=float, default=0.1)
