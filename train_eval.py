@@ -18,15 +18,15 @@ def train(modelConfig):
     device = torch.device(modelConfig["device"])
     N = modelConfig["num_classes"]
 
-    model = UNet(modelConfig["channel"], modelConfig["channel_mult"], modelConfig["attn"], modelConfig["num_res_blocks"], modelConfig["dropout"]).to(device)
-    if modelConfig["training_load_weight"]:
-        model.load_state_dict(torch.load(modelConfig["training_load_weight"]))
-    model.train()
-
     train_loader = create_dataset(modelConfig, return_loader=True)
     for x in train_loader:
         _, C, H, W = x.shape
         break
+
+    model = UNet(C, modelConfig["channel"], modelConfig["channel_mult"], modelConfig["attn"], modelConfig["num_res_blocks"], modelConfig["dropout"], N).to(device)
+    if modelConfig["training_load_weight"]:
+        model.load_state_dict(torch.load(modelConfig["training_load_weight"]))
+    model.train()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=modelConfig["lr"])
 
