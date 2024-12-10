@@ -82,19 +82,17 @@ def main():
     args['channel_mult'] = [1, 2]
     args['attn'] = []
 
-    for location in [args['save_weight_dir'], args['sampled_dir']]:
+    for key, location in {'save_weight_dir': args['save_weight_dir'],'sampled_dir': args['sampled_dir']}.values():
         if location == "None":
             continue
         if not os.path.exists(os.path.join(location, f'Run_{args["run_id"]}')):
             os.makedirs(os.path.join(location, f'Run_{args["run_id"]}'))
         else:
             print(f"Directory {location} already exists and will be overwritten.")
+        args[key] = os.path.join(location, f'Run_{args["run_id"]}/')
     
     if args['device'] == 'cpu':
         print("############## WARNING: Running on CPU ##############")
-
-    args['save_weight_dir'] = os.path.join(args['save_weight_dir'], f'Run_{args["run_id"]}/')
-    args['sampled_dir'] = os.path.join(args['sampled_dir'], f'Run_{args["run_id"]}/')
 
     if args['state'] == "train":
         train(args)
