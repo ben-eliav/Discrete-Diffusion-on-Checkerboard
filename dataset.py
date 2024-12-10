@@ -11,6 +11,7 @@ class CheckerboardDataset(Dataset):
         self.dataset_size = dataset_size
         self.n_grid_points = n_grid_points
         self.noisy_points = noisy_points
+        print(f'Noisy points: {noisy_points}')
         self.device = device
         self.num_squares = num_squares
         self.seeds = torch.randint(0, 100000, size=(dataset_size,))
@@ -34,7 +35,7 @@ def create_dataset(modelConfig, return_loader=False):
         data = CheckerboardDataset(
             dataset_size=modelConfig["train_size"],
             n_grid_points=modelConfig["img_size"],
-            noisy_points=modelConfig["noisy_points"] * modelConfig["img_size"] ** 2 // 2,
+            noisy_points=int(modelConfig["noisy_points"] * modelConfig["img_size"] ** 2 / 2),
             device=modelConfig["device"],
             num_squares=modelConfig["num_classes"],
             method=checkerboard.METHODS[modelConfig["checkerboard_method"]] if modelConfig["checkerboard_method"] in range(len(checkerboard.METHODS)) else checkerboard.create_checkerboard

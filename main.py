@@ -87,6 +87,9 @@ def main():
         else:
             print(f"Directory {location} already exists and will be overwritten.")
     
+    if args['device'] == 'cpu':
+        print("############## WARNING: Running on CPU ##############")
+
     args['save_weight_dir'] = os.path.join(args['save_weight_dir'], f'Run_{args["run_id"]}/')
     args['sampled_dir'] = os.path.join(args['sampled_dir'], f'Run_{args["run_id"]}/')
 
