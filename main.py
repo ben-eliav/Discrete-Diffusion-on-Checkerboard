@@ -82,7 +82,7 @@ def main():
     args['channel_mult'] = [1, 2]
     args['attn'] = []
 
-    for key, location in {'save_weight_dir': args['save_weight_dir'],'sampled_dir': args['sampled_dir']}.values():
+    for key, location in {'save_weight_dir': args['save_weight_dir'],'sampled_dir': args['sampled_dir']}.items():
         if location == "None":
             args[key] = None
         else:
