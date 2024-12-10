@@ -37,7 +37,7 @@ def create_dataset(modelConfig, return_loader=False):
             noisy_points=modelConfig["noisy_points"] * modelConfig["img_size"] ** 2 / 2,
             device=modelConfig["device"],
             num_squares=modelConfig["num_classes"],
-            method=checkerboard.METHODS[modelConfig["checkerboard_method"] if modelConfig["checkerboard_method"] in range(len(checkerboard.METHODS)) else checkerboard.create_checkerboard]
+            method=checkerboard.METHODS[modelConfig["checkerboard_method"]] if modelConfig["checkerboard_method"] in range(len(checkerboard.METHODS)) else checkerboard.create_checkerboard
         )
 
     elif modelConfig["dataset"].lower() == "mnist":
