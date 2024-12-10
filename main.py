@@ -50,15 +50,17 @@ def main():
     args = parser.parse_args()
     args = vars(args)
 
+    print('here')
+
     for location in [args['save_weight_dir'], args['sampled_dir']]:
-        if not os.path.exists(os.path.join(location, f'Run_{args['run_id']}')):
-            os.makedirs(os.path.join(location, f'Run_{args['run_id']}'))
+        if not os.path.exists(os.path.join(location, f'Run_{args["run_id"]}')):
+            os.makedirs(os.path.join(location, f'Run_{args["run_id"]}'))
     
     args['save_weight_dir'] = os.path.join(args['save_weight_dir'], f'Run_{args["run_id"]}/')
     args['sampled_dir'] = os.path.join(args['sampled_dir'], f'Run_{args["run_id"]}/')
 
-    if args.state == "train":
-        train(args)
-    elif args.state == "test":
-        test(args)
+    # if args.state == "train":
+    #     train(args)
+    # elif args.state == "test":
+    #     test(args)
     

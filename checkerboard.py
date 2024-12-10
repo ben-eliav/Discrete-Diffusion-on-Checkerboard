@@ -86,10 +86,10 @@ def display_checkerboards(n_grid_points: int = 256, batch_size: int = 200, devic
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_grid_points", type=int, default=256)
-    parser.add_argument("--batch_size", type=int, default=200)
+    parser.add_argument("--batch_size", type=int, default=10000)
     parser.add_argument("--device", type=str, default="cpu")
     parser.add_argument("--num_squares", type=int, default=8)
-    parser.add_argument("--seed", type=int, default=89)
+    parser.add_argument("--seed", type=int, default=4)
     parser.add_argument("--save", action="store_true")
     args = parser.parse_args()
     display_checkerboards(**vars(args))
