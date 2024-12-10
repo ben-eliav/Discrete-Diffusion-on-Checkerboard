@@ -22,7 +22,7 @@ class CheckerboardDataset(Dataset):
             import os
             _, axs = plt.subplots(1, 4, figsize=(20, 5))
             for i in range(4):
-                axs[i].imshow(self[i][0])
+                axs[i].imshow(self[i][0], cmap="gray")
                 axs[i].axis("off")
             plt.tight_layout()
             if not os.path.exists(show_checkerboards):
@@ -49,7 +49,7 @@ def create_dataset(modelConfig, return_loader=False):
             n_grid_points=modelConfig["img_size"],
             noisy_points=int(modelConfig["noisy_points"] * modelConfig["img_size"] ** 2 / 2),
             device=modelConfig["device"],
-            num_squares=modelConfig["num_classes"],
+            num_squares=modelConfig["checkerboard_squares"],
             method=checkerboard.METHODS[modelConfig["checkerboard_method"]] if modelConfig["checkerboard_method"] in range(len(checkerboard.METHODS)) else checkerboard.create_checkerboard,
             show_checkerboards=modelConfig['sampled_dir'] if modelConfig['show_original'] else None
         )
