@@ -55,7 +55,7 @@ def create_dataset(modelConfig, return_loader=False):
         )
 
     elif modelConfig["dataset"].lower() == "mnist":
-        data = MNIST(root='./data', train=True, download=True, transform=transforms.ToTensor)
+        data = MNIST(root='./data', train=True, download=True, transform=transforms.ToTensor())
 
     elif modelConfig["dataset"].lower() == "cifar10":
         data = CIFAR10(root='./data', train=True, download=True, transform=transforms.Compose([
