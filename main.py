@@ -73,8 +73,9 @@ def main():
     parser.add_argument("--dataset", type=str, default="checkerboard")
     parser.add_argument("--train_size", type=int, default=1000)
     parser.add_argument("--checkerboard_noise", type=float, default=0.1)
-    parser.add_argument("--show_process", action="store_true")
     parser.add_argument("--run_id", type=str, default="0")
+    parser.add_argument("--show_process", action="store_true")
+    parser.add_argument('--show_original', action='store_true')
 
     args = parser.parse_args()
     args = vars(args)

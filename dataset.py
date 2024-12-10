@@ -7,7 +7,7 @@ from torchvision import transforms
 import checkerboard
 
 class CheckerboardDataset(Dataset):
-    def __init__(self, dataset_size, n_grid_points: int = 128, noisy_points: int = 200, device: str = "cpu", num_squares=4, method=checkerboard.METHODS[3]):
+    def __init__(self, dataset_size, n_grid_points: int = 128, noisy_points: int = 200, device: str = "cpu", num_squares=4, method=checkerboard.METHODS[3], show_checkerboards=None):
         self.dataset_size = dataset_size
         self.n_grid_points = n_grid_points
         self.noisy_points = noisy_points
@@ -17,6 +17,18 @@ class CheckerboardDataset(Dataset):
         self.seeds = torch.randint(0, 100000, size=(dataset_size,))
         self.method = method
         self.items = self.generate_items()
+        if show_checkerboards is not None:
+            import matplotlib.pyplot as plt
+            import os
+            _, axs = plt.subplots(1, 4, figsize=(20, 5))
+            for i in range(4):
+                axs[i].imshow(self[i])
+                axs[i].axis("off")
+            plt.tight_layout()
+            if not os.path.exists(show_checkerboards):
+                os.makedirs(show_checkerboards)
+            plt.savefig(os.path.join(show_checkerboards, "checkerboard.png"))
+
 
     def generate_items(self):
         dataset = [self.method(n_grid_points=self.n_grid_points, noisy_points=self.noisy_points, device=self.device, num_squares=self.num_squares, seed=self.seeds[idx]) for idx in range(len(self))]
@@ -38,7 +50,8 @@ def create_dataset(modelConfig, return_loader=False):
             noisy_points=int(modelConfig["noisy_points"] * modelConfig["img_size"] ** 2 / 2),
             device=modelConfig["device"],
             num_squares=modelConfig["num_classes"],
-            method=checkerboard.METHODS[modelConfig["checkerboard_method"]] if modelConfig["checkerboard_method"] in range(len(checkerboard.METHODS)) else checkerboard.create_checkerboard
+            method=checkerboard.METHODS[modelConfig["checkerboard_method"]] if modelConfig["checkerboard_method"] in range(len(checkerboard.METHODS)) else checkerboard.create_checkerboard,
+            show_checkerboards=modelConfig['sampled_dir'] if modelConfig['show_original'] else None
         )
 
     elif modelConfig["dataset"].lower() == "mnist":

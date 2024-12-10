@@ -33,16 +33,16 @@ def train(modelConfig):
     """ For now, we will assume that the diffusion method is discrete (D3PM) """
     d3pm = D3PM(model, modelConfig["T"], N, hybrid_loss_coeff=0.0).to(device)
     d3pm.train()
+    best_loss = float("inf")
 
     for epoch in range(modelConfig["epoch"]):
         loss_ema = None
-        best_loss = float("inf")
         loading_bar = tqdm(train_loader)
         for x in loading_bar:
             optimizer.zero_grad()
             x = x.to(device)
             x = (x * (N - 1)).round().long().clamp(0, N - 1)
-            loss, info = d3pm(x)
+            loss, _ = d3pm(x)
             loss.backward()
             norm = nn.utils.clip_grad_norm_(model.parameters(), modelConfig["grad_clip"])
             optimizer.step()
@@ -57,7 +57,7 @@ def train(modelConfig):
             best_loss = loss_ema
             torch.save(model.state_dict(), modelConfig["save_weight_dir"] + f"ckpt_{epoch}_.pt")
 
-        if modelConfig["show_process"] and epoch % (modelConfig["epoch"] // 10) == 0:
+        if modelConfig["show_process"] and (epoch % (modelConfig["epoch"] // 10) == 0 or epoch == modelConfig["epoch"] - 1):
             model.eval()
             with torch.no_grad():
                 init_noise = torch.randint(0, N, (4, C, H, W)).to(device)
