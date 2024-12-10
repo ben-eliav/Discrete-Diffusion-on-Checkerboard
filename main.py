@@ -89,10 +89,10 @@ def main():
     args['save_weight_dir'] = os.path.join(args['save_weight_dir'], f'Run_{args["run_id"]}/')
     args['sampled_dir'] = os.path.join(args['sampled_dir'], f'Run_{args["run_id"]}/')
 
-    # if args.state == "train":
-    #     train(args)
-    # elif args.state == "test":
-    #     test(args)
+    if args['state'] == "train":
+        train(args)
+    elif args['state'] == "test":
+        test(args)
     
 if __name__ == '__main__':
     main()
