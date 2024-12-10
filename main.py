@@ -84,12 +84,14 @@ def main():
 
     for key, location in {'save_weight_dir': args['save_weight_dir'],'sampled_dir': args['sampled_dir']}.values():
         if location == "None":
-            continue
-        if not os.path.exists(os.path.join(location, f'Run_{args["run_id"]}')):
-            os.makedirs(os.path.join(location, f'Run_{args["run_id"]}'))
+            args[key] = None
         else:
-            print(f"Directory {location} already exists and will be overwritten.")
-        args[key] = os.path.join(location, f'Run_{args["run_id"]}/')
+            args[key] = os.path.join(location, f'Run_{args["run_id"]}/')
+            if not os.path.exists(args[key]):
+                os.makedirs(args[key])
+            else:
+                print(f"Directory {location} already exists and will be overwritten.")
+        
     
     if args['device'] == 'cpu':
         print("############## WARNING: Running on CPU ##############")

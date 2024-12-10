@@ -53,11 +53,12 @@ def train(modelConfig):
                 loss_ema = loss_ema * 0.99 + loss.item() * 0.01
             loading_bar.set_description(f"Epoch {epoch} --- loss: {loss_ema:.4f}, grad_norm: {norm:.4f}")
 
-        if loss_ema < best_loss and modelConfig["save_weight_dir"]:
+        if loss_ema < best_loss and modelConfig["save_weight_dir"] is not None:
             best_loss = loss_ema
             torch.save(model.state_dict(), modelConfig["save_weight_dir"] + f"ckpt_{epoch}_.pt")
 
         if modelConfig["show_process"] and (epoch % (modelConfig["epoch"] // 10) == 0 or epoch == modelConfig["epoch"] - 1):
+            assert modelConfig["sampled_dir"] is not None, "Provide a directory to save the sampled images."
             model.eval()
             with torch.no_grad():
                 init_noise = torch.randint(0, N, (4, C, H, W)).to(device)
