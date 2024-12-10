@@ -72,8 +72,8 @@ def main():
     parser.add_argument("--dataset", type=str, default="checkerboard")
     parser.add_argument("--train_size", type=int, default=1000)
     parser.add_argument("--checkerboard_noise", type=float, default=0.1)
-    parser.add_argument("--run_id", type=str, default="0")
     parser.add_argument("--show_process", action="store_true")
+    parser.add_argument("--run_id", type=str, default="0")
 
     args = parser.parse_args()
     args = vars(args)
@@ -83,6 +83,8 @@ def main():
     for location in [args['save_weight_dir'], args['sampled_dir']]:
         if not os.path.exists(os.path.join(location, f'Run_{args["run_id"]}')):
             os.makedirs(os.path.join(location, f'Run_{args["run_id"]}'))
+        else:
+            print(f"Directory {location} already exists and will be overwritten.")
     
     args['save_weight_dir'] = os.path.join(args['save_weight_dir'], f'Run_{args["run_id"]}/')
     args['sampled_dir'] = os.path.join(args['sampled_dir'], f'Run_{args["run_id"]}/')
