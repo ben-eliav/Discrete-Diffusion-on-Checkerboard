@@ -61,13 +61,14 @@ def create_checkerboard4(n_grid_points: int = 128, batch_size: int = 200, device
     num_squares = 2 ** np.random.randint(1, int(np.log2(num_squares))+1)
     return create_checkerboard3(n_grid_points, batch_size, device, num_squares, seed)
 
+METHODS = [create_checkerboard1, create_checkerboard2, create_checkerboard3, create_checkerboard4]
+
 def create_checkerboard(*args, **kwargs):
-    methods = [create_checkerboard1, create_checkerboard2, create_checkerboard3, create_checkerboard4]
-    if kwargs.get("method") is not None and type(kwargs.get("method")) == int and 0 <= kwargs.get("method") < len(methods):
-        return methods[kwargs.pop("method")](*args, **kwargs)
+    if kwargs.get("method") is not None and type(kwargs.get("method")) == int and 0 <= kwargs.get("method") < len(METHODS):
+        return METHODS[kwargs.pop("method")](*args, **kwargs)
     else:
-        return methods[np.random.randint(0, len(methods))](*args, **kwargs)
-        
+        return METHODS[np.random.randint(0, len(METHODS))](*args, **kwargs)
+
 
 def display_checkerboards(n_grid_points: int = 256, batch_size: int = 200, device: str = "cpu", num_squares=8, seed=89, save=False):
     _, axs = plt.subplots(1, 4, figsize=(20, 5))
