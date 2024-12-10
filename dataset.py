@@ -22,7 +22,7 @@ class CheckerboardDataset(Dataset):
             import os
             _, axs = plt.subplots(1, 4, figsize=(20, 5))
             for i in range(4):
-                axs[i].imshow(self[i])
+                axs[i].imshow(self[i][0])
                 axs[i].axis("off")
             plt.tight_layout()
             if not os.path.exists(show_checkerboards):
