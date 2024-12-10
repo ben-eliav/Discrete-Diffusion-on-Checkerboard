@@ -53,7 +53,7 @@ def train(modelConfig):
                 loss_ema = loss_ema * 0.99 + loss.item() * 0.01
             loading_bar.set_description(f"Epoch {epoch} --- loss: {loss_ema:.4f}, grad_norm: {norm:.4f}")
 
-        if loss_ema < best_loss:
+        if loss_ema < best_loss and modelConfig["save_weight_dir"]:
             best_loss = loss_ema
             torch.save(model.state_dict(), modelConfig["save_weight_dir"] + f"ckpt_{epoch}_.pt")
 

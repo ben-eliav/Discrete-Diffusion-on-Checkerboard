@@ -83,6 +83,8 @@ def main():
     args['attn'] = []
 
     for location in [args['save_weight_dir'], args['sampled_dir']]:
+        if location is None:
+            continue
         if not os.path.exists(os.path.join(location, f'Run_{args["run_id"]}')):
             os.makedirs(os.path.join(location, f'Run_{args["run_id"]}'))
         else:
