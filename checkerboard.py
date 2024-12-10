@@ -70,16 +70,18 @@ def create_checkerboard(*args, **kwargs):
         return METHODS[np.random.randint(0, len(METHODS))](*args, **kwargs)
 
 
-def display_checkerboards(n_grid_points: int = 256, batch_size: int = 200, device: str = "cpu", num_squares=8, seed=89, save=False):
+def display_checkerboards(n_grid_points: int = 256, batch_size: int = 200, device: str = "cpu", num_squares=4, seed=89, save=False):
     _, axs = plt.subplots(1, 4, figsize=(20, 5))
     for i in range(4):
+        if i == 3:
+            num_squares = 8
         axs[i].imshow(create_checkerboard(n_grid_points, batch_size, device, num_squares, seed, method=i), cmap="gray")
         axs[i].axis("off")
     plt.tight_layout()
     if save:
-        if not os.path.exists("outputs"):
-            os.makedirs("outputs")
-        plt.savefig("outputs/checkerboards.png")
+        if not os.path.exists("outputs/checkerboards"):
+            os.makedirs("outputs/checkerboards")
+        plt.savefig("outputs/checkerboards/checkerboard.png")
     plt.show()
         
 
@@ -88,7 +90,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_grid_points", type=int, default=256)
     parser.add_argument("--batch_size", type=int, default=10000)
     parser.add_argument("--device", type=str, default="cpu")
-    parser.add_argument("--num_squares", type=int, default=8)
+    parser.add_argument("--num_squares", type=int, default=4)
     parser.add_argument("--seed", type=int, default=4)
     parser.add_argument("--save", action="store_true")
     args = parser.parse_args()

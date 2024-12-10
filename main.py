@@ -48,9 +48,7 @@ def main():
     parser.set_defaults(**modelConfig)
     parser.add_argument("--show_process", action="store_true")
     args = parser.parse_args()
-    args = vars(args)
-
-    print('here')
+    args = vars(args)    
 
     for location in [args['save_weight_dir'], args['sampled_dir']]:
         if not os.path.exists(os.path.join(location, f'Run_{args["run_id"]}')):
@@ -64,3 +62,5 @@ def main():
     # elif args.state == "test":
     #     test(args)
     
+if __name__ == '__main__':
+    main()
