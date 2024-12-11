@@ -112,6 +112,6 @@ def test(modelConfig):
     C, H, W = get_image_shape(modelConfig)
 
     model = UNet(C, modelConfig["channel"], modelConfig["channel_mult"], modelConfig["attn"], modelConfig["num_res_blocks"], modelConfig["dropout"], N).to(device)
-    model.load_state_dict(torch.load(load_weight))
+    model.load_state_dict(torch.load(load_weight, weights_only=True))
     d3pm = D3PM(model, modelConfig["T"], N, hybrid_loss_coeff=0.0).to(device)    
     sample(modelConfig, model, d3pm, device, (C, H, W), 4, N)
