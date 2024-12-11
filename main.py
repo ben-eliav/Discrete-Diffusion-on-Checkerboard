@@ -3,39 +3,6 @@ import os
 
 from train_eval import train, test
 
-
-# modelConfig = {
-#         "state": "train",
-#         "epoch": 50,
-#         "batch_size": 64,
-#         "T": 1000,
-#         "channel": 32,
-#         "channel_mult": [1, 2],
-#         "attn": [],
-#         "num_res_blocks": 2,
-#         "dropout": 0.15,
-#         "lr": 5e-4,
-#         "multiplier": 2.,
-#         "beta_1": 1e-4,
-#         "beta_T": 0.02,
-#         "img_size": 32,
-#         "grad_clip": 0.1,
-#         "device": "cuda:0",
-#         "training_load_weight": None,
-#         "save_weight_dir": "./Checkpoints/",
-#         "test_load_weight": "ckpt_49_.pt",
-#         "sampled_dir": "./outputs/",
-#         "sampledNoisyImgName": "NoisyNoGuidenceImgs.png",
-#         "sampledImgName": "SampledDDPM.png",
-#         "nrow": 8,
-#         "num_classes": 2,
-#         "checkerboard_method": 4,
-#         "dataset": "checkerboard",
-#         "train_size": 1000,
-#         "checkerboard_noise": 0.1,
-#         "run_id": "0",
-# }
-
 def main():
     parser = argparse.ArgumentParser()
 
@@ -61,7 +28,7 @@ def main():
     parser.add_argument("--sampledImgName", type=str, default="SampledD3PM")
     parser.add_argument("--nrow", type=int, default=8)
     parser.add_argument("--num_classes", type=int, default=2, help="number of classes in the dataset - how to discretize the data")
-    parser.add_argument("--checkerboard_method", type=int, default=2, help="use create_checkerboard[i] to create dataset")
+    parser.add_argument("--checkerboard_method", type=int, default=2, help="use create_checkerboard[i+1] to create dataset")
     parser.add_argument('--checkerboard_squares', type=int, default=4, help='number of squares in a row of the checkerboard')
     parser.add_argument("--noisy_points", type=float, default=0.3, help="fraction of noisy points in the checkerboard dataset")
     parser.add_argument("--dataset", type=str, default="checkerboard", help="checkerboard, MNIST, or CIFAR10")

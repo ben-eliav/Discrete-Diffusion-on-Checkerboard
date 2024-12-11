@@ -29,8 +29,9 @@ def sample(modelConfig, model, diffusion, device, shape, num_samples, N, train_e
         if train_epoch is not None:
             gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}_{train_epoch}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
             last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}_{train_epoch}.png")
-        gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
-        last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.png")
+        else:
+            gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
+            last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.png")
 
 
 def train(modelConfig):
