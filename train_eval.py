@@ -9,7 +9,7 @@ from PIL import Image
 from d3pm import *
 from discrete_unet import *
 from checkerboard import *
-from dataset import create_dataset
+from dataset import create_dataset, get_image_shape
 
 def train(modelConfig):
     """
@@ -20,6 +20,8 @@ def train(modelConfig):
 
     train_loader = create_dataset(modelConfig, return_loader=True)
     for x in train_loader:
+        if modelConfig['dataset'].lower() in ['mnist', 'cifar10']:
+            x = x[0]
         _, C, H, W = x.shape
         break
 
@@ -39,6 +41,8 @@ def train(modelConfig):
         loss_ema = None
         loading_bar = tqdm(train_loader)
         for x in loading_bar:
+            if modelConfig['dataset'].lower() in ['mnist', 'cifar10']:
+                x = x[0]
             optimizer.zero_grad()
             x = x.to(device)
             x = (x * (N - 1)).round().long().clamp(0, N - 1)
@@ -78,4 +82,24 @@ def train(modelConfig):
 
 
 def test(modelConfig):
-    pass
+    load_weight = os.path.join(modelConfig["save_weight_dir"], modelConfig["test_load_weight"])
+    device = torch.device(modelConfig["device"])
+    N = modelConfig["num_classes"]
+    C, H, W = get_image_shape(modelConfig)
+
+    model = UNet(C, modelConfig["channel"], modelConfig["channel_mult"], modelConfig["attn"], modelConfig["num_res_blocks"], modelConfig["dropout"], N).to(device)
+    model.load_state_dict(torch.load(load_weight))
+    model.eval()
+    d3pm = D3PM(model, modelConfig["T"], N, hybrid_loss_coeff=0.0).to(device)    
+
+    with torch.no_grad():
+        init_noise = torch.randint(0, N, (4, C, H, W)).to(device)
+        images = d3pm.sample_with_image_sequence(init_noise, stride=40)
+        gif = []
+        for image in images:
+            x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
+            img = (x_as_image * 255).astype(np.uint8)
+            gif.append(Image.fromarray(img))
+        gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
+        last_image = gif[-1]
+        last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.png")

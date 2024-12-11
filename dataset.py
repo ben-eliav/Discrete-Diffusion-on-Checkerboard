@@ -42,6 +42,17 @@ class CheckerboardDataset(Dataset):
         return self.items[idx]
     
 
+def get_image_shape(modelConfig):
+    if modelConfig["dataset"] == "checkerboard":
+        return (1, modelConfig["img_size"], modelConfig["img_size"])
+    elif modelConfig["dataset"].lower() == "mnist":
+        return (1, 28, 28)
+    elif modelConfig["dataset"].lower() == "cifar10":
+        return (3, 32, 32)
+    else:
+        raise ValueError("Dataset not recognized. Please choose from checkerboard, MNIST, or CIFAR10.")
+    
+
 def create_dataset(modelConfig, return_loader=False):
     if modelConfig["dataset"] == "checkerboard":
         data = CheckerboardDataset(
