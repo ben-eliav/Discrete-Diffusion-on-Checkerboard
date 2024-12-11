@@ -5,11 +5,34 @@ from tqdm import tqdm
 import numpy as np
 from PIL import Image
 
-
 from d3pm import *
 from discrete_unet import *
 from checkerboard import *
 from dataset import create_dataset, get_image_shape
+from utils import *
+
+
+def sample(modelConfig, model, diffusion, device, shape, num_samples, N, train_epoch=None):
+    """
+    Sample images from the trained model.
+    """
+    model.eval()
+    diffusion.eval()
+    with torch.no_grad():
+        init_noise = torch.randint(0, N, (num_samples, *shape)).to(device)
+        images = diffusion.sample_with_image_sequence(init_noise, stride=40)
+        gif = []
+        for image in images:
+            x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
+            img = (x_as_image * 255).astype(np.uint8)
+            gif.append(Image.fromarray(img))
+        last_image = gif[-1]
+        if train_epoch is not None:
+            gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}_{train_epoch}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
+            last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}_{train_epoch}.png")
+        gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
+        last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.png")
+
 
 def train(modelConfig):
     """
@@ -59,22 +82,23 @@ def train(modelConfig):
 
         if loss_ema < best_loss and modelConfig["save_weight_dir"] is not None:
             best_loss = loss_ema
-            torch.save(model.state_dict(), modelConfig["save_weight_dir"] + f"ckpt_{epoch}_.pt")
+            torch.save(model.state_dict(), modelConfig["save_weight_dir"] + f"ckpt_{epoch}.pt")
 
         if modelConfig["show_process"] and (epoch % (modelConfig["epoch"] // 10) == 0 or epoch == modelConfig["epoch"] - 1):
             assert modelConfig["sampled_dir"] is not None, "Provide a directory to save the sampled images."
-            model.eval()
-            with torch.no_grad():
-                init_noise = torch.randint(0, N, (4, C, H, W)).to(device)
-                images = d3pm.sample_with_image_sequence(init_noise, stride=40)
-                gif = []
-                for image in images:
-                    x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
-                    img = (x_as_image * 255).astype(np.uint8)
-                    gif.append(Image.fromarray(img))
-                gif[0].save(modelConfig["sampled_dir"] + f"sampled_{epoch}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
-                last_image = gif[-1]
-                last_image.save(modelConfig["sampled_dir"] + f"sampled_{epoch}.png")
+            sample(modelConfig, model, d3pm, device, (C, H, W), 4, N, epoch)
+            # model.eval()
+            # with torch.no_grad():
+            #     init_noise = torch.randint(0, N, (4, C, H, W)).to(device)
+            #     images = d3pm.sample_with_image_sequence(init_noise, stride=40)
+            #     gif = []
+            #     for image in images:
+            #         x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
+            #         img = (x_as_image * 255).astype(np.uint8)
+            #         gif.append(Image.fromarray(img))
+            #     gif[0].save(modelConfig["sampled_dir"] + f"sampled_{epoch}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
+            #     last_image = gif[-1]
+            #     last_image.save(modelConfig["sampled_dir"] + f"sampled_{epoch}.png")
             model.train()
         
     print("Training complete.")
@@ -82,24 +106,12 @@ def train(modelConfig):
 
 
 def test(modelConfig):
-    load_weight = os.path.join(modelConfig["save_weight_dir"], modelConfig["test_load_weight"])
+    load_weight = find_file_with_largest_number(modelConfig["save_weight_dir"])
     device = torch.device(modelConfig["device"])
     N = modelConfig["num_classes"]
     C, H, W = get_image_shape(modelConfig)
 
     model = UNet(C, modelConfig["channel"], modelConfig["channel_mult"], modelConfig["attn"], modelConfig["num_res_blocks"], modelConfig["dropout"], N).to(device)
     model.load_state_dict(torch.load(load_weight))
-    model.eval()
     d3pm = D3PM(model, modelConfig["T"], N, hybrid_loss_coeff=0.0).to(device)    
-
-    with torch.no_grad():
-        init_noise = torch.randint(0, N, (4, C, H, W)).to(device)
-        images = d3pm.sample_with_image_sequence(init_noise, stride=40)
-        gif = []
-        for image in images:
-            x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
-            img = (x_as_image * 255).astype(np.uint8)
-            gif.append(Image.fromarray(img))
-        gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
-        last_image = gif[-1]
-        last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.png")
+    sample(modelConfig, model, d3pm, device, (C, H, W), 4, N)
