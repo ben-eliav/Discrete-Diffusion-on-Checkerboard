@@ -7,7 +7,6 @@ from PIL import Image
 
 from d3pm import *
 from discrete_unet import *
-from checkerboard import *
 from dataset import create_dataset, get_image_shape
 from utils import *
 

@@ -1,13 +1,6 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.nn.init as init
-import numpy as np
 import argparse
+import os
 
-from checkerboard import *
-from d3pm import D3PM
-from discrete_unet import *
 from train_eval import train, test
 
 
@@ -46,11 +39,11 @@ from train_eval import train, test
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--state", type=str, default="train")
+    parser.add_argument("--state", type=str, default="train", help="train or test")
     parser.add_argument("--epoch", type=int, default=50)
     parser.add_argument("--batch_size", type=int, default=64)
-    parser.add_argument("--T", type=int, default=1000)
-    parser.add_argument("--channel", type=int, default=32)
+    parser.add_argument("--T", type=int, default=1000, help="Number of diffusion steps")
+    parser.add_argument("--channel", type=int, default=32, help="Number of channels in the first layer of UNet")
     parser.add_argument("--num_res_blocks", type=int, default=2)
     parser.add_argument("--dropout", type=float, default=0.15)
     parser.add_argument("--lr", type=float, default=5e-4)
@@ -67,20 +60,20 @@ def main():
     parser.add_argument("--sampledNoisyImgName", type=str, default="NoisyNoGuidenceImgs")
     parser.add_argument("--sampledImgName", type=str, default="SampledD3PM")
     parser.add_argument("--nrow", type=int, default=8)
-    parser.add_argument("--num_classes", type=int, default=2)
-    parser.add_argument("--checkerboard_method", type=int, default=2)
-    parser.add_argument('--checkerboard_squares', type=int, default=4)
-    parser.add_argument("--noisy_points", type=float, default=0.3)
-    parser.add_argument("--dataset", type=str, default="checkerboard")
-    parser.add_argument("--train_size", type=int, default=1000)
-    parser.add_argument("--run_id", type=str, default="0")
-    parser.add_argument("--show_process", action="store_true")
-    parser.add_argument('--show_original', action='store_true')
+    parser.add_argument("--num_classes", type=int, default=2, help="number of classes in the dataset - how to discretize the data")
+    parser.add_argument("--checkerboard_method", type=int, default=2, help="use create_checkerboard[i] to create dataset")
+    parser.add_argument('--checkerboard_squares', type=int, default=4, help='number of squares in a row of the checkerboard')
+    parser.add_argument("--noisy_points", type=float, default=0.3, help="fraction of noisy points in the checkerboard dataset")
+    parser.add_argument("--dataset", type=str, default="checkerboard", help="checkerboard, MNIST, or CIFAR10")
+    parser.add_argument("--train_size", type=int, default=1000, help="number of samples in the training dataset, for checkerboard dataset")
+    parser.add_argument("--run_id", type=str, default="0", help="used to create a directory to save weights and sampled images")
+    parser.add_argument("--show_process", action="store_true", help="show sampled images during training")
+    parser.add_argument('--show_original', action='store_true', help='show checkerboards from the original dataset')
 
     args = parser.parse_args()
     args = vars(args)
-    args['channel_mult'] = [1, 2]
-    args['attn'] = []
+    args['channel_mult'] = [1, 2]  # value to multiply the number of channels in each layer of UNet
+    args['attn'] = []  # indices of layers in UNet to apply attention
 
     for key, location in {'save_weight_dir': args['save_weight_dir'],'sampled_dir': args['sampled_dir']}.items():
         if location == "None":
