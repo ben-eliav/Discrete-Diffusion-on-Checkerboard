@@ -90,7 +90,7 @@ def main():
             if not os.path.exists(args[key]):
                 os.makedirs(args[key])
             else:
-                print(f"Directory {location} already exists and will be overwritten.")
+                print(f"Directory {args[key]} already exists and will be overwritten.")
         
     
     if args['device'] == 'cpu':
