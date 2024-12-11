@@ -87,18 +87,6 @@ def train(modelConfig):
         if modelConfig["show_process"] and (epoch % (modelConfig["epoch"] // 10) == 0 or epoch == modelConfig["epoch"] - 1):
             assert modelConfig["sampled_dir"] is not None, "Provide a directory to save the sampled images."
             sample(modelConfig, model, d3pm, device, (C, H, W), 4, N, epoch)
-            # model.eval()
-            # with torch.no_grad():
-            #     init_noise = torch.randint(0, N, (4, C, H, W)).to(device)
-            #     images = d3pm.sample_with_image_sequence(init_noise, stride=40)
-            #     gif = []
-            #     for image in images:
-            #         x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
-            #         img = (x_as_image * 255).astype(np.uint8)
-            #         gif.append(Image.fromarray(img))
-            #     gif[0].save(modelConfig["sampled_dir"] + f"sampled_{epoch}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
-            #     last_image = gif[-1]
-            #     last_image.save(modelConfig["sampled_dir"] + f"sampled_{epoch}.png")
             model.train()
         
     print("Training complete.")
@@ -111,7 +99,11 @@ def test(modelConfig):
     N = modelConfig["num_classes"]
     C, H, W = get_image_shape(modelConfig)
 
-    model = UNet(C, modelConfig["channel"], modelConfig["channel_mult"], modelConfig["attn"], modelConfig["num_res_blocks"], modelConfig["dropout"], N).to(device)
-    model.load_state_dict(torch.load(load_weight, weights_only=True))
+    try:
+        model = UNet(C, modelConfig["channel"], modelConfig["channel_mult"], modelConfig["attn"], modelConfig["num_res_blocks"], modelConfig["dropout"], N).to(device)
+        model.load_state_dict(torch.load(load_weight, weights_only=True))
+    except:
+        print('No weights found. Use --state train to create weights.')
+        return
     d3pm = D3PM(model, modelConfig["T"], N, hybrid_loss_coeff=0.0).to(device)    
     sample(modelConfig, model, d3pm, device, (C, H, W), 4, N)

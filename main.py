@@ -89,7 +89,7 @@ def main():
             args[key] = os.path.join(location, f'Run_{args["run_id"]}/')
             if not os.path.exists(args[key]):
                 os.makedirs(args[key])
-            else:
+            elif args["state"] == "train":
                 print(f"Directory {args[key]} already exists and will be overwritten.")
         
     
