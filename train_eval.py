@@ -118,6 +118,6 @@ def test(modelConfig):
     if not modelConfig['display_distribution']:
         sample(modelConfig, model, d3pm, device, (C, H, W), 4, N)
     else:
-        probabilities = probabilities(modelConfig, model, d3pm, device, (C, H, W), 4, N)
-        for i, prob in enumerate(probabilities):
+        probs = probabilities(modelConfig, model, d3pm, device, (C, H, W), 4, N)
+        for i, prob in enumerate(probs):
             print(f'Probability distribution at step {i*10}: {prob}')
