@@ -34,6 +34,15 @@ def sample(modelConfig, model, diffusion, device, shape, num_samples, N, train_e
             last_image.save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}.png")
 
 
+def probabilities(modelConfig, model, diffusion, device, shape, num_samples, N, train_epoch=None):
+    model.eval()
+    diffusion.eval()
+    with torch.no_grad():
+        init_noise = torch.randint(0, N, (num_samples, *shape)).to(device)
+        probabilities = diffusion.sample_with_probability_sequence(init_noise, stride=40)
+        return probabilities
+
+
 def train(modelConfig):
     """
     Train and save a diffusion model based on the chosen dataset.
@@ -106,4 +115,9 @@ def test(modelConfig):
         print('No weights found. Use --state train to create weights.')
         return
     d3pm = D3PM(model, modelConfig["T"], N, hybrid_loss_coeff=0.0).to(device)    
-    sample(modelConfig, model, d3pm, device, (C, H, W), 4, N)
+    if not modelConfig['display_distribution']:
+        sample(modelConfig, model, d3pm, device, (C, H, W), 4, N)
+    else:
+        probabilities = probabilities(modelConfig, model, d3pm, device, (C, H, W), 4, N)
+        for i, prob in enumerate(probabilities):
+            print(f'Probability distribution at step {i*10}: {prob}')

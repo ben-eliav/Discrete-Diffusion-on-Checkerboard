@@ -164,7 +164,7 @@ class D3PM(nn.Module):
             "ce_loss": ce_loss.detach().item(),
         }
 
-    def p_sample(self, x, t, noise):
+    def p_sample(self, x, t, noise, return_distribution=False):
 
         predicted_x0_logits = self.model_predict(x, t)
         pred_q_posterior_logits = self.q_posterior_logits(predicted_x0_logits, x, t)
@@ -177,6 +177,8 @@ class D3PM(nn.Module):
         sample = torch.argmax(
             pred_q_posterior_logits + gumbel_noise * not_first_step, dim=-1
         )
+        if return_distribution:
+            return sample, pred_q_posterior_logits
         return sample
 
     def sample(self, x):
@@ -204,3 +206,21 @@ class D3PM(nn.Module):
             images.append(x)
 
         return images
+    
+    def sample_with_probability_sequence(self, x, stride=10):
+        steps = 0
+        probabilities = []
+        for t in reversed(range(1, self.n_T)):
+            t = torch.tensor([t] * x.shape[0], device=x.device)
+            x, prob = self.p_sample(
+                x, t, torch.rand((*x.shape, self.num_classses), device=x.device), return_distribution=True
+            )
+            steps += 1
+            if steps % stride == 0:
+                probabilities.append(prob[0, 0].detach().cpu().numpy())
+
+        # if last step is not divisible by stride, we add the last probability.
+        if steps % stride != 0:
+            probabilities.append(prob[0, 0].detach().cpu().numpy())
+
+        return probabilities
