@@ -217,10 +217,10 @@ class D3PM(nn.Module):
             )
             steps += 1
             if steps % stride == 0:
-                probabilities.append(prob[0, 0].detach().cpu().numpy())
+                probabilities.append(prob[0, :, 0, 0].detach().cpu())
 
         # if last step is not divisible by stride, we add the last probability.
         if steps % stride != 0:
-            probabilities.append(prob[0, 0, 0, 0].detach().cpu().numpy())
+            probabilities.append(prob[0, :, 0, 0].detach().cpu())
 
         return probabilities
