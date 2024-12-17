@@ -120,4 +120,4 @@ def test(modelConfig):
     else:
         probs = probabilities(modelConfig, model, d3pm, device, (C, H, W), 4, N)
         for i, prob in enumerate(probs):
-            print(f'Probability distribution at step {i*10} for pixel (0,0): {prob}')
+            print(f'Probability distribution at step {i*10} for pixel (0,0): {nn.Softmax()(prob[0,0,0,0]).item()}')
