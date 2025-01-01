@@ -87,7 +87,7 @@ def train(modelConfig):
                 loss_ema = loss.item()  # first iteration
             else:
                 loss_ema = loss_ema * 0.99 + loss.item() * 0.01
-            loading_bar.set_description(f"Epoch {epoch} --- loss: {loss_ema:.4f}, grad_norm: {norm:.4f}")
+            loading_bar.set_description(f"Epoch {epoch:3d} --- loss: {loss_ema:.4f}, grad_norm: {norm:.4f}")
 
         if loss_ema < best_loss and modelConfig["save_weight_dir"] is not None:
             best_loss = loss_ema
