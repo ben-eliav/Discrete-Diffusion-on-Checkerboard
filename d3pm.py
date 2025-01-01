@@ -213,6 +213,7 @@ class D3PM(nn.Module):
 
             return images
         else:
+            x0 = []
             for t in reversed(range(1, self.n_T)):
                 t = torch.tensor([t] * x.shape[0], device=x.device)
                 x, predicted_x0 = self.p_sample(
@@ -220,11 +221,13 @@ class D3PM(nn.Module):
                 )
                 steps += 1
                 if steps % stride == 0:
-                    images.append((x, predicted_x0))
+                    images.append(x)
+                    x0.append(predicted_x0)
 
             # if last step is not divisible by stride, we add the last image.
             if steps % stride != 0:
-                images.append((x, predicted_x0))
+                images.append(x)
+                x0.append(predicted_x0)
 
             return images
         
