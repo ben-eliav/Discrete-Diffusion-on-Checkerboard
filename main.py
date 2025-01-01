@@ -37,6 +37,7 @@ def main():
     parser.add_argument("--show_process", action="store_true", help="show sampled images during training")
     parser.add_argument('--show_original', action='store_true', help='show checkerboards from the original dataset')
     parser.add_argument('--display_distribution', action='store_true', help='display the distribution of the data (unet predictions)')
+    parser.add_argument('--show_x0_pred', action='store_true', help='show the predicted x0 at every stage of the diffusion')
 
     args = parser.parse_args()
     args = vars(args)
