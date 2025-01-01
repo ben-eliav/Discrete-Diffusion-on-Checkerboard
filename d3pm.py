@@ -229,7 +229,7 @@ class D3PM(nn.Module):
                 images.append(x)
                 x0.append(predicted_x0)
 
-            return images
+            return images, x0
         
     
     def sample_with_probability_sequence(self, x, stride=10):
