@@ -164,7 +164,7 @@ class D3PM(nn.Module):
             "ce_loss": ce_loss.detach().item(),
         }
 
-    def p_sample(self, x, t, noise, return_distribution=False):
+    def p_sample(self, x, t, noise, return_distribution=False, show_predicted_x0=False):
 
         predicted_x0_logits = self.model_predict(x, t)
         pred_q_posterior_logits = self.q_posterior_logits(predicted_x0_logits, x, t)
@@ -179,6 +179,11 @@ class D3PM(nn.Module):
         )
         if return_distribution:
             return sample, pred_q_posterior_logits
+        
+        if show_predicted_x0:
+            predicted_x0 = torch.argmax(predicted_x0_logits, dim=-1)
+            return sample, predicted_x0
+
         return sample
 
     def sample(self, x):
@@ -189,23 +194,40 @@ class D3PM(nn.Module):
             )
         return x
 
-    def sample_with_image_sequence(self, x, stride=10):
+    def sample_with_image_sequence(self, x, stride=10, show_predicted_x0=False):
         steps = 0
         images = []
-        for t in reversed(range(1, self.n_T)):
-            t = torch.tensor([t] * x.shape[0], device=x.device)
-            x = self.p_sample(
-                x, t, torch.rand((*x.shape, self.num_classses), device=x.device)
-            )
-            steps += 1
-            if steps % stride == 0:
+        if not show_predicted_x0:
+            for t in reversed(range(1, self.n_T)):
+                t = torch.tensor([t] * x.shape[0], device=x.device)
+                x = self.p_sample(
+                    x, t, torch.rand((*x.shape, self.num_classses), device=x.device)
+                )
+                steps += 1
+                if steps % stride == 0:
+                    images.append(x)
+
+            # if last step is not divisible by stride, we add the last image.
+            if steps % stride != 0:
                 images.append(x)
 
-        # if last step is not divisible by stride, we add the last image.
-        if steps % stride != 0:
-            images.append(x)
+            return images
+        else:
+            for t in reversed(range(1, self.n_T)):
+                t = torch.tensor([t] * x.shape[0], device=x.device)
+                x, predicted_x0 = self.p_sample(
+                    x, t, torch.rand((*x.shape, self.num_classses), device=x.device), show_predicted_x0=True
+                )
+                steps += 1
+                if steps % stride == 0:
+                    images.append((x, predicted_x0))
 
-        return images
+            # if last step is not divisible by stride, we add the last image.
+            if steps % stride != 0:
+                images.append((x, predicted_x0))
+
+            return images
+        
     
     def sample_with_probability_sequence(self, x, stride=10):
         steps = 0

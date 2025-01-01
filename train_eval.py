@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
-from torchvision.utils import make_grid
 from tqdm import tqdm
 import numpy as np
-from PIL import Image
 
 from d3pm import *
 from discrete_unet import *
@@ -18,13 +16,22 @@ def sample(modelConfig, model, diffusion, device, shape, num_samples, N, train_e
     model.eval()
     diffusion.eval()
     with torch.no_grad():
+        x0 = None
         init_noise = torch.randint(0, N, (num_samples, *shape)).to(device)
-        images = diffusion.sample_with_image_sequence(init_noise, stride=40)
-        gif = []
+        if modelConfig['show_x0_pred']:
+            images, x0 = diffusion.sample_with_image_sequence(init_noise, stride=40, show_predicted_x0=True)
+        else:
+            images = diffusion.sample_with_image_sequence(init_noise, stride=40)
+        gif, gif_x0 = [], []
+
         for image in images:
-            x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
-            img = (x_as_image * 255).astype(np.uint8)
-            gif.append(Image.fromarray(img))
+            add_to_gif(gif, image, N)
+
+        if modelConfig['show_x0_pred']:
+            for image in x0:
+                add_to_gif(gif_x0, image, N)
+            gif_x0[0].save(modelConfig["sampled_dir"] + f"{modelConfig['predicted_x0']}_{train_epoch}.gif", save_all=True, append_images=gif_x0[1:], duration=100, loop=0)
+
         last_image = gif[-1]
         if train_epoch is not None:
             gif[0].save(modelConfig["sampled_dir"] + f"{modelConfig['sampledImgName']}_{train_epoch}.gif", save_all=True, append_images=gif[1:], duration=100, loop=0)
