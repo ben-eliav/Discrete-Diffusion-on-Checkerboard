@@ -25,11 +25,11 @@ def sample(modelConfig, model, diffusion, device, shape, num_samples, N, train_e
         gif, gif_x0 = [], []
 
         for image in images:
-            add_to_gif(gif, image, N)
+            add_to_gif(gif, image, N, num_samples)
 
         if modelConfig['show_x0_pred']:
             for image in x0:
-                add_to_gif(gif_x0, image, N)
+                add_to_gif(gif_x0, image, N, num_samples)
             gif_x0[0].save(modelConfig["sampled_dir"] + f"generated_x0.gif", save_all=True, append_images=gif_x0[1:], duration=100, loop=0)
 
         last_image = gif[-1]
