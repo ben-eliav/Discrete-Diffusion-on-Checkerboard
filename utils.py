@@ -27,6 +27,9 @@ def find_file_with_largest_number(folder_path):
 
 
 def add_to_gif(gif, image, N):
-    x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
+    try:
+        x_as_image = make_grid(image.float() / (N - 1), nrow=np.sqrt(N)).permute(1, 2, 0).cpu().numpy()
+    except:
+        x_as_image = make_grid(image.float() / (N - 1), nrow=4).permute(1, 2, 0).cpu().numpy()
     img = (x_as_image * 255).astype(np.uint8)
     gif.append(Image.fromarray(img))
