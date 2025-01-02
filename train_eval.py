@@ -123,7 +123,7 @@ def test(modelConfig):
         return
     d3pm = D3PM(model, modelConfig["T"], N, hybrid_loss_coeff=0.0).to(device)    
     if not modelConfig['display_distribution']:
-        sample(modelConfig, model, d3pm, device, (C, H, W), 4, N)
+        sample(modelConfig, model, d3pm, device, (C, H, W), modelConfig['test_batch'], N)
     else:
         probs = probabilities(modelConfig, model, d3pm, device, (C, H, W), 4, N)
         for i, prob in enumerate(probs):

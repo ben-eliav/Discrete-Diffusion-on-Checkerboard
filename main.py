@@ -33,6 +33,7 @@ def main():
     parser.add_argument("--noisy_points", type=float, default=0.3, help="fraction of noisy points in the checkerboard dataset")
     parser.add_argument("--dataset", type=str, default="checkerboard", help="checkerboard, MNIST, or CIFAR10")
     parser.add_argument("--train_size", type=int, default=1000, help="number of samples in the training dataset, for checkerboard dataset")
+    parser.add_argument("--test_batch", type=int, default=64, help="number of images sampled.")
     parser.add_argument("--run_id", type=str, default="0", help="used to create a directory to save weights and sampled images")
     parser.add_argument("--show_process", action="store_true", help="show sampled images during training")
     parser.add_argument('--show_original', action='store_true', help='show checkerboards from the original dataset')
